@@ -4,22 +4,24 @@
 -include .env
 export
 
+DOCKER_COMPOSE := docker compose
+
 # ── Docker Compose targets ───────────────────────────────────────────────────
 
 up:
-	docker compose up --build -d
+	$(DOCKER_COMPOSE) up --build -d
 
 down:
-	docker compose down -v
+	$(DOCKER_COMPOSE) down -v
 
 logs:
-	docker compose logs -f app
+	$(DOCKER_COMPOSE) logs -f app
 
 # ── Database helpers ─────────────────────────────────────────────────────────
 
 seed:
 	@echo ">>> Loading seed data..."
-	@docker compose exec -T db \
+	@$(DOCKER_COMPOSE) exec -T db \
 		psql --username=$${POSTGRES_USER:-ledger} --dbname=$${POSTGRES_DB:-ledgerlite} \
 		< internal/db/seed.sql
 	@echo ">>> Seed complete."
@@ -28,7 +30,7 @@ seed:
 
 attack:
 	@echo ">>> Running attack-demo.sh..."
-	@docker compose exec -T db \
+	@$(DOCKER_COMPOSE) exec -T db \
 		psql --username=$${POSTGRES_USER:-ledger} --dbname=$${POSTGRES_DB:-ledgerlite} \
 		< scripts/attack-demo.sh
 	@echo ">>> Attack demo complete."
