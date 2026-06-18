@@ -1,0 +1,36 @@
+# Rename this file to .gitignore after cloning / running setup.sh
+# (The dot-file is excluded by the parent workspace's .gitignore during scaffolding.)
+
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go build cache
+/vendor/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of `go tool cover`
+*.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Environment files — never commit secrets
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
