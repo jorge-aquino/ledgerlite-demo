@@ -9,6 +9,7 @@ bin/
 *.so
 *.dylib
 server
+.internal/
 
 # Go build cache
 /vendor/

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     customer_id      INT         NOT NULL REFERENCES customers(id),
     amount_cents     BIGINT      NOT NULL,
     currency         TEXT        NOT NULL DEFAULT 'USD',
-    idempotency_key  TEXT        NOT NULL UNIQUE,  -- VULN #6: computed with MD5
+    idempotency_key  TEXT        NOT NULL UNIQUE,
     hmac             TEXT        NOT NULL DEFAULT '', -- VULN #4: always empty
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

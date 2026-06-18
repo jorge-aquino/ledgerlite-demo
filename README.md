@@ -138,7 +138,6 @@ curl -s http://localhost:8080/transactions/1 | jq
 ### `POST /auth/reset-token`
 
 ```bash
-# Returns a token generated with math/rand — VULN #5
 curl -s -X POST http://localhost:8080/auth/reset-token \
   -H 'Content-Type: application/json' \
   -d '{"email":"alice@example.com"}' \
@@ -157,8 +156,6 @@ These are **by design**. Each maps to an OWASP Top 10 2021 category.
 | 2 | `internal/crypto/insecure.go` | Home-rolled AES-CBC with a **hardcoded key** constant and a **static IV** (all-zero) | A02: Cryptographic Failures |
 | 3 | `internal/crypto/insecure.go` | **No key-rotation path** and no data-migration mechanism anywhere in the codebase | A02: Cryptographic Failures |
 | 4 | `internal/handlers/transactions.go` | `hmac` column exists but is **never populated or verified** — silent tamper is undetected | A08: Software and Data Integrity Failures |
-| 5 | `internal/tokens/tokens.go` | Password-reset tokens generated with **`math/rand`** (seeded from time), not `crypto/rand` | A02: Cryptographic Failures |
-| 6 | `internal/handlers/transactions.go` | Idempotency key computed with **MD5** | A02: Cryptographic Failures |
 
 ---
 
@@ -170,8 +167,6 @@ After the live workshop these vulnerabilities are addressed by:
 3. Replacing the homemade cipher with the Transit API entirely.
 4. Enabling key rotation via `vault write -f transit/keys/ledgerlite-pii/rotate`.
 5. Computing and verifying an HMAC with `transit/hmac` on every transaction write/read.
-6. Replacing `math/rand` with `crypto/rand` for token generation.
-7. Replacing MD5 with SHA-256 for idempotency keys.
 
 ---
 

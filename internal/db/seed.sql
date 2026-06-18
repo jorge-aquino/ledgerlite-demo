@@ -13,7 +13,6 @@ INSERT INTO customers (name, email, ssn, card_number) VALUES
 ON CONFLICT (email) DO NOTHING;
 
 -- VULN #4: hmac column left empty (default '')
--- VULN #6: idempotency_key is an MD5 hash (computed here with md5() for clarity)
 INSERT INTO transactions (customer_id, amount_cents, currency, idempotency_key, hmac)
 SELECT
     c.id,
