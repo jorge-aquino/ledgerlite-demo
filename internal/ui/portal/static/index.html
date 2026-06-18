@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LedgerLite Bank — Secure Payments</title>
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon">◈</span>
+        <span class="brand-name">LedgerLite <strong>Bank</strong></span>
+      </div>
+      <nav>
+        <span id="nav-greeting" class="nav-greeting hidden"></span>
+        <button id="btn-logout" class="btn-ghost hidden">Sign out</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Landing / Sign-up view ────────────────────────────────────────────── -->
+  <main id="view-auth" class="view">
+    <div class="hero">
+      <h1>Banking you can <span class="accent">trust</span>.</h1>
+      <p class="hero-sub">Open an account in seconds. Your data is always safe with us.</p>
+    </div>
+
+    <div class="card-grid">
+      <!-- Sign up -->
+      <div class="card" id="signup-card">
+        <h2>Create account</h2>
+        <form id="form-signup">
+          <div class="field">
+            <label for="s-name">Full name</label>
+            <input id="s-name"  name="name"        type="text"  placeholder="Jane Smith"           required />
+          </div>
+          <div class="field">
+            <label for="s-email">Email address</label>
+            <input id="s-email" name="email"       type="email" placeholder="jane@example.com"     required />
+          </div>
+          <div class="field">
+            <label for="s-ssn">Social Security Number</label>
+            <input id="s-ssn"   name="ssn"         type="text"  placeholder="123-45-6789"          required autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="s-card">Card number</label>
+            <input id="s-card"  name="card_number" type="text"  placeholder="4111 1111 1111 1111"  required autocomplete="off" />
+          </div>
+          <button type="submit" class="btn-primary btn-full" id="btn-signup">Open my account</button>
+          <p id="signup-error" class="form-error hidden"></p>
+        </form>
+        <p class="fine-print">🔒 Your information is protected with bank-grade encryption.</p>
+      </div>
+
+      <!-- Log in (by customer ID — demo shortcut) -->
+      <div class="card" id="login-card">
+        <h2>Sign in</h2>
+        <p class="card-sub">Already have an account? Enter your customer ID to sign in.</p>
+        <form id="form-login">
+          <div class="field">
+            <label for="l-id">Customer ID</label>
+            <input id="l-id" name="customer_id" type="number" min="1" placeholder="e.g. 1" required />
+          </div>
+          <button type="submit" class="btn-primary btn-full">Sign in</button>
+          <p id="login-error" class="form-error hidden"></p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Account / Dashboard view ─────────────────────────────────────────── -->
+  <main id="view-account" class="view hidden">
+    <div class="account-layout">
+
+      <!-- Account summary -->
+      <div class="card account-card">
+        <div class="account-header">
+          <div>
+            <p class="account-label">Account holder</p>
+            <h2 id="acct-name">—</h2>
+            <p id="acct-email" class="account-email">—</p>
+          </div>
+          <div class="account-badge">✓ Verified</div>
+        </div>
+        <div class="account-fields">
+          <div class="acct-field">
+            <span class="acct-field-label">Customer ID</span>
+            <span id="acct-id" class="acct-field-value mono">—</span>
+          </div>
+          <div class="acct-field">
+            <span class="acct-field-label">SSN on file</span>
+            <span id="acct-ssn" class="acct-field-value mono">—</span>
+          </div>
+          <div class="acct-field">
+            <span class="acct-field-label">Card number</span>
+            <span id="acct-card" class="acct-field-value mono">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Make a payment -->
+      <div class="card">
+        <h2>Make a payment</h2>
+        <form id="form-payment">
+          <div class="field">
+            <label for="p-amount">Amount (USD)</label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">$</span>
+              <input id="p-amount" name="amount_dollars" type="number" min="0.01" step="0.01" placeholder="0.00" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="p-note">Note (optional)</label>
+            <input id="p-note" name="note" type="text" placeholder="e.g. Rent, utilities…" />
+          </div>
+          <button type="submit" class="btn-primary btn-full">Send payment</button>
+          <p id="payment-error" class="form-error hidden"></p>
+        </form>
+      </div>
+
+      <!-- Transaction history -->
+      <div class="card tx-history-card">
+        <div class="tx-history-header">
+          <h2>Recent transactions</h2>
+          <button id="btn-refresh-tx" class="btn-ghost btn-sm">Refresh</button>
+        </div>
+        <div id="tx-history" class="tx-list">
+          <span class="empty-state">No transactions yet.</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── Toast ─────────────────────────────────────────────────────────────── -->
+  <div id="toast" class="toast hidden"></div>
+
+  <footer>
+    <span>© 2024 LedgerLite Bank N.A. · Member FDIC · All deposits insured · Your data is encrypted end-to-end.</span>
+    <a href="/security" class="security-link" title="Security Dashboard">🔍</a>
+  </footer>
+
+  <script src="portal.js"></script>
+</body>
+</html>

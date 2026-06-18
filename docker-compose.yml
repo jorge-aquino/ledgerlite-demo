@@ -56,5 +56,14 @@ services:
       vault:
         condition: service_healthy
 
+  adminer:
+    image: adminer:4
+    restart: unless-stopped
+    ports:
+      - "8888:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:

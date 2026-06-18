@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,8 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/your-org/ledgerlite-demo/internal/handlers"
+	"github.com/your-org/ledgerlite-demo/internal/ui"
+	"github.com/your-org/ledgerlite-demo/internal/ui/portal"
 )
 
 func main() {
@@ -37,6 +40,28 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+
+	// Customer-facing portal at "/".
+	portalRoot, err := fs.Sub(portal.Static, "static")
+	if err != nil {
+		log.Fatalf("embed portal sub-FS error: %v", err)
+	}
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFileFS(w, r, portalRoot, "index.html")
+	})
+	r.Handle("/portal.css", http.FileServerFS(portalRoot))
+	r.Handle("/portal.js", http.FileServerFS(portalRoot))
+
+	// Security dashboard at "/security".
+	securityRoot, err := fs.Sub(ui.Static, "static")
+	if err != nil {
+		log.Fatalf("embed security sub-FS error: %v", err)
+	}
+	r.Get("/security", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFileFS(w, r, securityRoot, "index.html")
+	})
+	r.Handle("/styles.css", http.FileServerFS(securityRoot))
+	r.Handle("/dashboard.js", http.FileServerFS(securityRoot))
 
 	r.Get("/healthz", healthz(db))
 
