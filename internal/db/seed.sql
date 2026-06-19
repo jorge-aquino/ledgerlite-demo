@@ -22,3 +22,62 @@ INSERT INTO customers (name, email, ssn, card_number, created_at) VALUES
 ON CONFLICT (email) DO NOTHING;
 
 -- VULN #4: hmac column left empty (default '')
+-- VULN #6: idempotency_key is an MD5 hash (computed here with md5() for clarity)
+-- Transactions span ~90 days and cover SaaS subscriptions, marketplace charges,
+-- cross-border wires, a refund (negative amount), and FX-denominated settlements.
+INSERT INTO transactions (customer_id, amount_cents, currency, idempotency_key, hmac, created_at)
+SELECT
+    c.id,
+    t.amount_cents,
+    t.currency,
+    md5(c.email || '::' || t.amount_cents::text || '::' || t.currency || '::' || t.seq::text),
+    '',
+    NOW() - (t.days_ago * INTERVAL '1 day')
+FROM (VALUES
+    -- margaret.osei: annual SaaS seat, two marketplace orders, a failed-then-retry pair
+    ('margaret.osei@ledgerlite.com',      119900, 'USD',  1,  85),
+    ('margaret.osei@ledgerlite.com',        3499, 'USD',  2,  72),
+    ('margaret.osei@ledgerlite.com',       18750, 'USD',  3,  58),
+    ('margaret.osei@ledgerlite.com',       -3499, 'USD',  4,  57),  -- refund for order #2
+    ('margaret.osei@ledgerlite.com',        3499, 'USD',  5,  56),  -- retry after refund
+
+    -- dmitri.volkov: EUR cross-border wire, monthly subscription x2
+    ('dmitri.volkov@ledgerlite.com',      250000, 'EUR',  6,  70),
+    ('dmitri.volkov@ledgerlite.com',        9900, 'EUR',  7,  45),
+    ('dmitri.volkov@ledgerlite.com',        9900, 'EUR',  8,  15),
+
+    -- priya.nair: GBP marketplace + USD SaaS
+    ('priya.nair@ledgerlite.com',          47500, 'GBP',  9,  55),
+    ('priya.nair@ledgerlite.com',          14900, 'USD', 10,  40),
+    ('priya.nair@ledgerlite.com',           2999, 'USD', 11,  10),
+
+    -- tomas.guerrero: large wire, FX settlement
+    ('tomas.guerrero@ledgerlite.com',     500000, 'USD', 12,  50),
+    ('tomas.guerrero@ledgerlite.com',      32000, 'MXN', 13,  48),
+
+    -- aiko.nakamura: JPY domestic + USD SaaS + small top-up
+    ('aiko.nakamura@ledgerlite.com',      980000, 'JPY', 14,  42),
+    ('aiko.nakamura@ledgerlite.com',       14900, 'USD', 15,  28),
+    ('aiko.nakamura@ledgerlite.com',        1000, 'USD', 16,   7),
+
+    -- james.okonkwo: NGN local payment + USD invoice
+    ('james.okonkwo@ledgerlite.com',     7500000, 'NGN', 17,  35),
+    ('james.okonkwo@ledgerlite.com',       89900, 'USD', 18,  20),
+
+    -- fatima.alhassan: monthly subscription, one-time professional services
+    ('fatima.alhassan@ledgerlite.com',      4900, 'USD', 19,  28),
+    ('fatima.alhassan@ledgerlite.com',     75000, 'USD', 20,  12),
+
+    -- lucas.bergstrom: SEK marketplace + EUR SaaS
+    ('lucas.bergstrom@ledgerlite.com',    149900, 'SEK', 21,  18),
+    ('lucas.bergstrom@ledgerlite.com',      9900, 'EUR', 22,   5),
+
+    -- chloe.whitmore: two recent orders
+    ('chloe.whitmore@ledgerlite.com',       5499, 'USD', 23,  12),
+    ('chloe.whitmore@ledgerlite.com',      22000, 'USD', 24,   3),
+
+    -- ravi.chandrasekhar: brand-new account, one pending charge
+    ('ravi.chandrasekhar@ledgerlite.com',  49900, 'USD', 25,   2)
+) AS t(email, amount_cents, currency, seq, days_ago)
+JOIN customers c ON c.email = t.email
+ON CONFLICT (idempotency_key) DO NOTHING;
