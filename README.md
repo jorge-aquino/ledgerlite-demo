@@ -116,7 +116,7 @@ curl -s -X POST http://localhost:8080/customers \
 ### `GET /customers/{id}`
 
 ```bash
-# Returns SSN and card_number IN THE CLEAR — VULN #1
+# Returns SSN and card_number IN THE CLEAR — 
 curl -s http://localhost:8080/customers/1 | jq
 ```
 

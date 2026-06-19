@@ -21,14 +21,12 @@ type CreateCustomerRequest struct {
 	CardNumber string `json:"card_number"`
 }
 
-// Customer is the API response type.
-// VULN #1: ssn and card_number are returned verbatim from the DB — plaintext PII in API responses.
 type Customer struct {
 	ID         int64     `json:"id"`
 	Name       string    `json:"name"`
 	Email      string    `json:"email"`
-	SSN        string    `json:"ssn"`         // VULN #1: plaintext in response
-	CardNumber string    `json:"card_number"` // VULN #1: plaintext in response
+	SSN        string    `json:"ssn"`         
+	CardNumber string    `json:"card_number"` 
 	CreatedAt  time.Time `json:"created_at"`
 }
 
@@ -53,13 +51,12 @@ func CreateCustomer(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// VULN #1: SSN and card number are inserted as plaintext — no encryption before storage.
 		var c Customer
 		err := db.QueryRowContext(r.Context(), `
 			INSERT INTO customers (name, email, ssn, card_number)
 			VALUES ($1, $2, $3, $4)
 			RETURNING id, name, email, ssn, card_number, created_at`,
-			req.Name, req.Email, req.SSN, req.CardNumber, // VULN #1
+			req.Name, req.Email, req.SSN, req.CardNumber,
 		).Scan(&c.ID, &c.Name, &c.Email, &c.SSN, &c.CardNumber, &c.CreatedAt)
 		if err != nil {
 			http.Error(w, "db error: "+err.Error(), http.StatusInternalServerError)
@@ -82,11 +79,10 @@ func GetCustomer(db *sql.DB) http.HandlerFunc {
 		}
 
 		var c Customer
-		// VULN #1: SSN and card number read back as plaintext and returned to the caller.
 		err = db.QueryRowContext(r.Context(), `
 			SELECT id, name, email, ssn, card_number, created_at
 			FROM customers WHERE id = $1`, id,
-		).Scan(&c.ID, &c.Name, &c.Email, &c.SSN, &c.CardNumber, &c.CreatedAt) // VULN #1
+		).Scan(&c.ID, &c.Name, &c.Email, &c.SSN, &c.CardNumber, &c.CreatedAt)
 		if err == sql.ErrNoRows {
 			http.Error(w, "not found", http.StatusNotFound)
 			return

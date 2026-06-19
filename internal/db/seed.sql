@@ -7,7 +7,6 @@
 --     Amex:       371449635398431,  378282246310005
 -- NEVER load real customer data into this demo database.
 
--- VULN #1: plaintext SSNs and card numbers written directly to the DB
 INSERT INTO customers (name, email, ssn, card_number, created_at) VALUES
     ('Margaret Osei',      'margaret.osei@ledgerlite.com',     '214-38-0001', '4111111111111111',  NOW() - INTERVAL '88 days'),
     ('Dmitri Volkov',      'dmitri.volkov@ledgerlite.com',     '519-62-0002', '5500005555555559',  NOW() - INTERVAL '75 days'),
@@ -21,7 +20,6 @@ INSERT INTO customers (name, email, ssn, card_number, created_at) VALUES
     ('Ravi Chandrasekhar', 'ravi.chandrasekhar@ledgerlite.com','190-67-0010', '5105105105105100',  NOW() - INTERVAL  '6 days')
 ON CONFLICT (email) DO NOTHING;
 
--- VULN #4: hmac column left empty (default '')
 -- Transactions span ~90 days and cover SaaS subscriptions, marketplace charges,
 -- cross-border wires, a refund (negative amount), and FX-denominated settlements.
 INSERT INTO transactions (customer_id, amount_cents, currency, idempotency_key, hmac, created_at)
