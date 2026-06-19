@@ -2,7 +2,7 @@
 package handlers
 
 import (
-	"crypto/md5" // VULN #6: MD5 for idempotency key
+	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
@@ -28,7 +28,7 @@ type Transaction struct {
 	AmountCents    int64     `json:"amount_cents"`
 	Currency       string    `json:"currency"`
 	IdempotencyKey string    `json:"idempotency_key"`
-	HMAC           string    `json:"hmac"` // VULN #4: always empty
+	HMAC           string    `json:"hmac"`
 	CreatedAt      time.Time `json:"created_at"`
 }
 
@@ -46,15 +46,11 @@ func CreateTransaction(db *sql.DB) http.HandlerFunc {
 			req.Currency = "USD"
 		}
 
-		// VULN #6: idempotency key is MD5(customer_id + amount + currency + timestamp).
-		//          MD5 is cryptographically broken and should not be used for security-relevant
-		//          hashing. Replace with SHA-256 or a UUID.
 		raw := fmt.Sprintf("%d::%d::%s::%d", req.CustomerID, req.AmountCents, req.Currency, time.Now().UnixNano())
-		sum := md5.Sum([]byte(raw)) //nolint:gosec // VULN #6
+		sum := md5.Sum([]byte(raw)) //nolint:gosec
 		idempotencyKey := hex.EncodeToString(sum[:])
 
-		// VULN #4: hmac column is never computed or stored — tampering goes undetected.
-		const hmac = "" // VULN #4: empty, always
+		const hmac = ""
 
 		var tx Transaction
 		err := db.QueryRowContext(r.Context(), `
@@ -98,9 +94,6 @@ func GetTransaction(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "db error: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		// VULN #4: no HMAC verification performed here — a tampered amount_cents would
-		//          pass through undetected.
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(tx) //nolint:errcheck

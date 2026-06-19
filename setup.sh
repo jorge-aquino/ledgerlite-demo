@@ -40,8 +40,6 @@ Vulnerabilities included (see README § Intentional Vulnerabilities):
   VULN #2 - Homemade AES-CBC, hardcoded key, static IV (A02)
   VULN #3 - No key rotation or data-migration path (A02)
   VULN #4 - HMAC column empty, no integrity verification (A08)
-  VULN #5 - Reset tokens via math/rand (A02)
-  VULN #6 - Idempotency key via MD5 (A02)
 
 WARNING: DO NOT DEPLOY. DO NOT USE REAL DATA."
 

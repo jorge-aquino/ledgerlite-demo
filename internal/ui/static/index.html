@@ -35,7 +35,7 @@
           <label>Scan IDs 1–<input id="customer-max" type="number" value="5" min="1" max="20" /></label>
         </div>
       </div>
-      <div id="customer-list" class="record-list">Scanning…</div>
+      <div id="customer-list" class="record-list record-grid">Scanning…</div>
       <details class="add-form">
         <summary>＋ Add customer</summary>
         <form id="form-create-customer">
@@ -54,12 +54,12 @@
     <!-- Transactions -->
     <section class="panel" id="transactions-panel">
       <div class="panel-header">
-        <h2>Transactions <span class="tag tag-vuln">VULN #4 #6 · A02/A08</span></h2>
+        <h2>Transactions <span class="tag tag-vuln">VULN #4 · A08</span></h2>
         <div class="panel-controls">
           <label>Scan IDs 1–<input id="tx-max" type="number" value="5" min="1" max="20" /></label>
         </div>
       </div>
-      <div id="tx-list" class="record-list">Scanning…</div>
+      <div id="tx-list" class="record-list record-grid">Scanning…</div>
       <details class="add-form">
         <summary>＋ Add transaction</summary>
         <form id="form-create-tx">
@@ -74,15 +74,6 @@
       </details>
     </section>
 
-    <!-- Token generator -->
-    <section class="panel" id="tokens-panel">
-      <div class="panel-header">
-        <h2>Reset-Token Generator <span class="tag tag-vuln">VULN #5 · A02</span></h2>
-      </div>
-      <p class="panel-desc">Calls <code>POST /auth/reset-token</code> five times. A predictable PRNG produces tokens that are guessable by timestamp enumeration.</p>
-      <button id="btn-gen-tokens" class="btn-primary">Generate 5 Tokens</button>
-      <div id="token-list" class="token-list"></div>
-    </section>
   </main>
 
   <footer><span>LedgerLite Demo · INTENTIONALLY VULNERABLE · HashiCorp Vault Transit remediation showcase</span></footer>

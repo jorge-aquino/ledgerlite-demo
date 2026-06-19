@@ -116,8 +116,7 @@ func ResetToken(db *sql.DB) http.HandlerFunc {
 			`SELECT EXISTS(SELECT 1 FROM customers WHERE email=$1)`, req.Email,
 		).Scan(&exists)
 
-		// VULN #5: token is generated with math/rand — predictable PRNG output.
-		tok := tokens.Generate() // VULN #5
+		tok := tokens.Generate()
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(ResetTokenResponse{Token: tok}) //nolint:errcheck
